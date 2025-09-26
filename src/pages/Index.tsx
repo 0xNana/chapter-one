@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { EditionSelector } from "@/components/EditionSelector";
 import { ProgressTracker } from "@/components/ProgressTracker";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/plasma-brand-hero.jpg";
 
 const Index = () => {
   const [showIntro, setShowIntro] = useState(true);

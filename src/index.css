@@ -6,47 +6,47 @@
 
 @layer base {
   :root {
-    /* Core Background Palette */
-    --background: 220 27% 8%;
-    --foreground: 210 20% 95%;
+    /* Plasma Brand - Core Background Palette */
+    --background: 150 32% 7%;
+    --foreground: 150 20% 95%;
     
-    /* Card System */
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 95%;
-    --card-hover: 220 25% 16%;
+    /* Plasma Brand - Card System */
+    --card: 158 36% 14%;
+    --card-foreground: 150 20% 95%;
+    --card-hover: 160 33% 18%;
     
-    /* Premium Gold Accents */
-    --primary: 45 85% 65%;
-    --primary-foreground: 220 27% 8%;
-    --primary-glow: 45 90% 70%;
+    /* Plasma Brand - British Racing Green Primary */
+    --primary: 150 50% 55%;
+    --primary-foreground: 150 32% 7%;
+    --primary-glow: 150 60% 65%;
     
-    /* Secondary System */
-    --secondary: 220 25% 16%;
-    --secondary-foreground: 210 20% 90%;
+    /* Plasma Brand - Secondary System */
+    --secondary: 160 33% 25%;
+    --secondary-foreground: 150 20% 90%;
     
-    /* Muted Elements */
-    --muted: 220 25% 14%;
-    --muted-foreground: 220 15% 60%;
+    /* Plasma Brand - Muted Elements */
+    --muted: 158 36% 16%;
+    --muted-foreground: 158 20% 60%;
     
-    /* Accent Colors */
-    --accent: 210 100% 65%;
-    --accent-foreground: 220 27% 8%;
+    /* Plasma Brand - Silver Blue Accents */
+    --accent: 214 50% 58%;
+    --accent-foreground: 150 32% 7%;
     
-    /* Interactive States */
-    --border: 220 25% 18%;
-    --input: 220 25% 16%;
-    --ring: 45 85% 65%;
+    /* Plasma Brand - Interactive States */
+    --border: 158 36% 22%;
+    --input: 158 36% 16%;
+    --ring: 150 50% 55%;
     
-    /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(45 85% 65%), hsl(50 90% 70%));
-    --gradient-dark: linear-gradient(180deg, hsl(220 27% 8%), hsl(220 25% 12%));
-    --gradient-card: linear-gradient(145deg, hsl(220 25% 12%), hsl(220 25% 16%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(45 85% 65% / 0.1), hsl(45 85% 65% / 0.05));
+    /* Plasma Brand - Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(150 50% 55%), hsl(150 60% 65%));
+    --gradient-dark: linear-gradient(180deg, hsl(150 32% 7%), hsl(158 36% 14%));
+    --gradient-card: linear-gradient(145deg, hsl(158 36% 14%), hsl(160 33% 18%));
+    --gradient-plasma-accent: linear-gradient(135deg, hsl(150 50% 55% / 0.1), hsl(214 50% 58% / 0.05));
     
-    /* Premium Shadows */
-    --shadow-premium: 0 25px 50px -12px hsl(45 85% 65% / 0.15);
-    --shadow-card: 0 10px 30px -10px hsl(220 27% 4% / 0.3);
-    --shadow-glow: 0 0 40px hsl(45 85% 65% / 0.2);
+    /* Plasma Brand - Premium Shadows */
+    --shadow-premium: 0 25px 50px -12px hsl(150 50% 55% / 0.15);
+    --shadow-card: 0 10px 30px -10px hsl(150 32% 4% / 0.3);
+    --shadow-glow: 0 0 40px hsl(150 50% 55% / 0.2);
     
     /* Animation Variables */
     --transition-premium: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -134,8 +134,8 @@
     background: var(--gradient-card);
   }
   
-  .gradient-gold-subtle {
-    background: var(--gradient-gold-subtle);
+  .gradient-plasma-accent {
+    background: var(--gradient-plasma-accent);
   }
   
   .shadow-premium {
