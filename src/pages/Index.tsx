@@ -12,7 +12,7 @@ const Index = () => {
     const timer1 = setTimeout(() => setAnimationPhase(1), 500);
     const timer2 = setTimeout(() => setAnimationPhase(2), 1500);
     const timer3 = setTimeout(() => setAnimationPhase(3), 2500);
-    const timer4 = setTimeout(() => setShowIntro(false), 3500);
+    const timer4 = setTimeout(() => setShowIntro(false), 60000); // 60 seconds delay
 
     return () => {
       clearTimeout(timer1);
@@ -22,16 +22,21 @@ const Index = () => {
     };
   }, []);
 
+  const handleSkipIntro = () => {
+    setShowIntro(false);
+  };
+
   if (showIntro) {
     return (
       <div 
-        className="min-h-screen bg-background flex items-center justify-center overflow-hidden relative"
+        className="min-h-screen bg-background flex items-center justify-center overflow-hidden relative cursor-pointer"
         style={{
           backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
+        onClick={handleSkipIntro}
       >
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-background/80" />
@@ -56,6 +61,13 @@ const Index = () => {
             <p className="text-lg md:text-xl text-foreground/80 font-light leading-relaxed">
               The pre-TGE arc. Thirteen historic editions capturing<br />
               Plasma's rise as the canonical settlement layer.
+            </p>
+          </div>
+
+          {/* Click to continue hint */}
+          <div className={`transition-all duration-1000 delay-2000 ${animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <p className="text-sm text-muted-foreground/60 mt-12 animate-pulse">
+              Click anywhere to continue
             </p>
           </div>
         </div>
