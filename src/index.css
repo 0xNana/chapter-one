@@ -2,41 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Premium Collectible Design System - Financial History Minting Experience */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    /* Core Background Palette */
+    --background: 220 27% 8%;
+    --foreground: 210 20% 95%;
+    
+    /* Card System */
+    --card: 220 25% 12%;
+    --card-foreground: 210 20% 95%;
+    --card-hover: 220 25% 16%;
+    
+    /* Premium Gold Accents */
+    --primary: 45 85% 65%;
+    --primary-foreground: 220 27% 8%;
+    --primary-glow: 45 90% 70%;
+    
+    /* Secondary System */
+    --secondary: 220 25% 16%;
+    --secondary-foreground: 210 20% 90%;
+    
+    /* Muted Elements */
+    --muted: 220 25% 14%;
+    --muted-foreground: 220 15% 60%;
+    
+    /* Accent Colors */
+    --accent: 210 100% 65%;
+    --accent-foreground: 220 27% 8%;
+    
+    /* Interactive States */
+    --border: 220 25% 18%;
+    --input: 220 25% 16%;
+    --ring: 45 85% 65%;
+    
+    /* Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(45 85% 65%), hsl(50 90% 70%));
+    --gradient-dark: linear-gradient(180deg, hsl(220 27% 8%), hsl(220 25% 12%));
+    --gradient-card: linear-gradient(145deg, hsl(220 25% 12%), hsl(220 25% 16%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(45 85% 65% / 0.1), hsl(45 85% 65% / 0.05));
+    
+    /* Premium Shadows */
+    --shadow-premium: 0 25px 50px -12px hsl(45 85% 65% / 0.15);
+    --shadow-card: 0 10px 30px -10px hsl(220 27% 4% / 0.3);
+    --shadow-glow: 0 0 40px hsl(45 85% 65% / 0.2);
+    
+    /* Animation Variables */
+    --transition-premium: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +117,116 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Premium Utility Classes */
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-dark {
+    background: var(--gradient-dark);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .gradient-gold-subtle {
+    background: var(--gradient-gold-subtle);
+  }
+  
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-premium {
+    transition: var(--transition-premium);
+  }
+  
+  .transition-fast {
+    transition: var(--transition-fast);
+  }
+}
+
+/* Premium Component Classes */
+@layer components {
+  .edition-card {
+    @apply gradient-card border border-border/50 rounded-xl p-6 transition-premium hover:border-primary/30 hover:shadow-glow hover:-translate-y-1;
+  }
+  
+  .claim-button {
+    @apply gradient-primary text-primary-foreground font-medium px-8 py-4 rounded-xl transition-premium hover:shadow-premium hover:scale-105;
+  }
+  
+  .timeline-marker {
+    @apply w-3 h-3 rounded-full bg-primary shadow-glow animate-pulse;
+  }
+  
+  .chapter-title {
+    @apply bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent font-bold;
+  }
+}
+
+/* Keyframe Animations */
+@layer utilities {
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.8s ease-out;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    background-size: 200% 100%;
   }
 }
