@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #7",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreidmiuipc4k6kwt7nnpxiwzn4s3da47zy7amoe4dmylih2xsjic3vy",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 7
+    },
+    {
+      "trait_type": "date",
+      "value": "June 17, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "Deposit Vaults Hit $1B"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Teal Grid"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "Circle IPO, Stripe x Privy"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-7"
+    }
+  ]
+}

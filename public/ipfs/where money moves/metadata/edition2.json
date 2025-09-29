@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #2",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreiby6lqgvqlq3s3vdi7vlp6ipnnse3n5ttt5c3qzi5dvxjkyzbrsym",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 2
+    },
+    {
+      "trait_type": "date",
+      "value": "April 8, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "IPO Signals & Legislative Stirring"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Teal Stack"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "Circle IPO, STABLE Act, Institutional Flow"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-2"
+    }
+  ]
+}

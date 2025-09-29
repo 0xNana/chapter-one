@@ -1,217 +1,263 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditionCard } from "./EditionCard";
 import { EditionModal } from "./EditionModal";
-import { ClaimFlow } from "./ClaimFlow";
 import { Button } from "@/components/ui/button";
-import { Calendar, TrendingUp, Users, Globe } from "lucide-react";
-
-// Mock data for the 13 editions
-const editions = [
-  {
-    id: 1,
-    title: "Genesis Protocol",
-    date: "2024-01-15",
-    headline: "Plasma Network Initialization",
-    stat: "First Block Mined",
-    description: "The foundational moment when Plasma's genesis block was mined, establishing the protocol's immutable foundation for programmable finance.",
-    lore: "In the depths of cryptographic history, the Genesis Protocol emerged as the first whisper of what would become a financial revolution. This edition captures the exact moment when mathematics met money.",
-    mintCount: 847,
-    totalSupply: 1000,
-    rarity: "Legendary"
-  },
-  {
-    id: 2,
-    title: "Settlement Surge",
-    date: "2024-02-08",
-    headline: "First Major Institution Onboard",
-    stat: "$1.2M Volume",
-    description: "The first institutional settlement marked Plasma's transition from experimental protocol to enterprise-grade infrastructure.",
-    lore: "Traditional finance meets programmable money. The old guard recognizes the new paradigm, marking a pivotal shift in global capital flows.",
-    mintCount: 623,
-    totalSupply: 1000,
-    rarity: "Epic"
-  },
-  {
-    id: 3,
-    title: "Cross-Chain Confluence",
-    date: "2024-02-28",
-    headline: "Multi-Chain Bridge Activation",
-    stat: "7 Networks Connected",
-    description: "Plasma's interoperability framework goes live, connecting disparate blockchain ecosystems under one settlement layer.",
-    lore: "The great convergence begins. Islands of value become an archipelago of liquidity, all flowing through Plasma's canonical channels.",
-    mintCount: 456,
-    totalSupply: 1000,
-    rarity: "Rare"
-  },
-  {
-    id: 4,
-    title: "Regulatory Recognition",
-    date: "2024-03-15",
-    headline: "G7 Nations Acknowledge Protocol",
-    stat: "Global Compliance",
-    description: "International regulatory bodies formally recognize Plasma as a legitimate settlement infrastructure, paving the way for mass adoption.",
-    lore: "When governments speak, markets listen. The moment sovereign powers acknowledged the inevitability of programmable money.",
-    mintCount: 789,
-    totalSupply: 1000,
-    rarity: "Epic"
-  },
-  {
-    id: 5,
-    title: "Velocity Breakthrough",
-    date: "2024-04-02",
-    headline: "100k TPS Milestone Achieved",
-    stat: "Network Performance",
-    description: "Plasma achieves unprecedented transaction throughput, proving its capability to handle global financial traffic.",
-    lore: "Speed is the currency of the digital age. This edition commemorates the moment Plasma outpaced legacy financial rails.",
-    mintCount: 234,
-    totalSupply: 1000,
-    rarity: "Legendary"
-  },
-  {
-    id: 6,
-    title: "DeFi Integration Wave",
-    date: "2024-04-20",
-    headline: "50+ Protocols Launch",
-    stat: "Ecosystem Expansion",
-    description: "The DeFi ecosystem explodes on Plasma, with dozens of protocols launching innovative financial primitives.",
-    lore: "Innovation compounds exponentially. Fifty minds building fifty different futures, all settling on the same trustless foundation.",
-    mintCount: 567,
-    totalSupply: 1000,
-    rarity: "Rare"
-  },
-  {
-    id: 7,
-    title: "Enterprise Exodus",
-    date: "2024-05-10",
-    headline: "Fortune 500 Migration Begins",
-    stat: "Corporate Adoption",
-    description: "Major corporations begin migrating treasury operations to Plasma-based solutions, signaling mainstream acceptance.",
-    lore: "The corporate world sheds its antiquated skin. Balance sheets transform from static ledgers to dynamic, programmable assets.",
-    mintCount: 678,
-    totalSupply: 1000,
-    rarity: "Epic"
-  },
-  {
-    id: 8,
-    title: "Quantum Resilience",
-    date: "2024-06-01",
-    headline: "Post-Quantum Cryptography Deployed",
-    stat: "Future-Proof Security",
-    description: "Plasma becomes the first major protocol to implement post-quantum cryptographic standards, securing against future threats.",
-    lore: "Preparing for tomorrow's threats with today's mathematics. When quantum computers arrive, Plasma will remain unbreakable.",
-    mintCount: 345,
-    totalSupply: 1000,
-    rarity: "Legendary"
-  },
-  {
-    id: 9,
-    title: "Global South Awakening",
-    date: "2024-06-25",
-    headline: "Emerging Markets Embrace Protocol",
-    stat: "3B+ Population Served",
-    description: "Plasma infrastructure enables financial inclusion for billions in emerging markets, democratizing access to global capital.",
-    lore: "The unbanked become the rebanked. Geography ceases to determine financial destiny as Plasma erases digital divides.",
-    mintCount: 890,
-    totalSupply: 1000,
-    rarity: "Epic"
-  },
-  {
-    id: 10,
-    title: "Central Bank Capitulation",
-    date: "2024-07-18",
-    headline: "First CBDC on Plasma",
-    stat: "Monetary Sovereignty",
-    description: "The first central bank digital currency launches on Plasma infrastructure, validating the protocol's institutional grade.",
-    lore: "Sovereign power meets sovereign code. When central banks build on your rails, you've achieved something beyond disruption.",
-    mintCount: 445,
-    totalSupply: 1000,
-    rarity: "Legendary"
-  },
-  {
-    id: 11,
-    title: "AI-Financial Fusion",
-    date: "2024-08-05",
-    headline: "Autonomous Trading Protocols Go Live",
-    stat: "AI-Native Finance",
-    description: "AI-driven financial protocols launch on Plasma, creating the first truly autonomous financial ecosystem.",
-    lore: "When artificial intelligence meets programmable money, the result transcends human financial imagination.",
-    mintCount: 123,
-    totalSupply: 1000,
-    rarity: "Mythical"
-  },
-  {
-    id: 12,
-    title: "Carbon Credit Confluence",
-    date: "2024-08-28",
-    headline: "Global Climate Finance Integration",
-    stat: "Planetary Scale",
-    description: "Plasma becomes the backbone for global carbon credit markets, financializing climate action at planetary scale.",
-    lore: "When saving the planet becomes profitable, and profits become programmable. The earth's lungs breathe through code.",
-    mintCount: 667,
-    totalSupply: 1000,
-    rarity: "Epic"
-  },
-  {
-    id: 13,
-    title: "Pre-TGE Culmination",
-    date: "2024-09-20",
-    headline: "Final Preparations Complete",
-    stat: "TGE Countdown",
-    description: "All systems converge as Plasma completes final preparations for the token generation event, marking the end of the pre-TGE arc.",
-    lore: "The chapter closes, but the story begins. Thirteen moments captured in time, leading to the dawn of a new financial epoch.",
-    mintCount: 0,
-    totalSupply: 1000,
-    rarity: "Mythical"
-  }
-];
+import { TrendingUp, Loader2 } from "lucide-react";
+import { loadAllEditions, getFallbackEditions, type EditionData } from "@/utils/metadataLoader";
+import { useWMMContract } from "@/hooks/useWMMContract";
+import { useAccount, useConnect, useWaitForTransactionReceipt } from "wagmi";
+import { useToast } from "@/hooks/use-toast";
+import { useNetworkSwitch } from "@/hooks/useNetworkSwitch";
 
 export const EditionSelector = () => {
-  const [selectedEdition, setSelectedEdition] = useState<typeof editions[0] | null>(null);
-  const [showClaimFlow, setShowClaimFlow] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
+  const [editions, setEditions] = useState<EditionData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEdition, setSelectedEdition] = useState<EditionData | null>(null);
+  const [isMinting, setIsMinting] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [initialMintCount, setInitialMintCount] = useState<number>(0);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const quantity = 1; 
+  
+  const { toast } = useToast();
+  const { isConnected } = useAccount();
+  const { connect, connectors, isPending } = useConnect();
+  const { maxMintsPerWallet, userMintedCount, canUserMint, mintRandomEditions, refreshSupplyData } = useWMMContract();
+  const { isOnPlasma, ensurePlasmaNetwork } = useNetworkSwitch();
+  const { isLoading: isConfirming, isSuccess: isConfirmed, error: confirmError } = useWaitForTransactionReceipt({
+    hash: txHash as `0x${string}` | undefined,
+    query: {
+      enabled: !!txHash && !!txHash.startsWith('0x'),
+    }
+  });
+
+  useEffect(() => {
+    if (isMinting && txHash && userMintedCount > initialMintCount) {
+      toast({
+        title: "Minting Complete!",
+        description: `Successfully minted ${quantity} edition from Chapter 1`,
+      });
+      
+      setTimeout(() => {
+        refreshSupplyData();
+      }, 1000);
+      
+      setIsMinting(false);
+      setTxHash(null as unknown as string);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  }, [isMinting, txHash, userMintedCount, initialMintCount, quantity, toast, refreshSupplyData, timeoutId]);
+
+  useEffect(() => {
+    if (isConfirmed && txHash) {
+      toast({
+        title: "Minting Complete!",
+        description: `Successfully minted ${quantity} edition from Chapter 1`,
+      });
+      
+      setTimeout(() => {
+        refreshSupplyData();
+      }, 1000);
+      
+      setIsMinting(false);
+      setTxHash(null as unknown as string);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  }, [isConfirmed, txHash, quantity, toast, refreshSupplyData, timeoutId]);
+
+  useEffect(() => {
+    if (confirmError) {
+      console.error('Transaction confirmation failed:', confirmError);
+      toast({
+        title: "Transaction Failed",
+        description: "Your transaction was not confirmed on the blockchain",
+        variant: "destructive",
+      });
+      setIsMinting(false);
+      setTxHash(null as unknown as string);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  }, [confirmError, toast, timeoutId]);
+
+  const handleConnectAndMint = async () => {
+    if (!isConnected) {
+      try {
+        const primaryConnector = connectors[0];
+        await connect({ connector: primaryConnector });
+        toast({
+          title: "Wallet Connected",
+          description: "Your wallet has been connected successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Connection Failed",
+          description: "Failed to connect wallet. Please try again.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    if (!isOnPlasma) {
+      try {
+        await ensurePlasmaNetwork();
+        toast({
+          title: "Network Switched",
+          description: "Switched to Plasma network. You can now mint.",
+        });
+        return;
+      } catch (error) {
+        toast({
+          title: "Network Switch Required",
+          description: "Please switch to Plasma network to mint",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    try {
+      setIsMinting(true);
+      setInitialMintCount(userMintedCount);
+      
+      const hash = await mintRandomEditions(quantity);
+      setTxHash(hash as unknown as string);
+      
+      const timeout = setTimeout(() => {
+        if (isMinting) {
+          console.log('Transaction timeout - checking if mint was successful by count');
+          if (userMintedCount > initialMintCount) {
+            toast({
+              title: "Minting Complete!",
+              description: `Successfully minted ${quantity} edition from Chapter 1`,
+            });
+            setIsMinting(false);
+            setTxHash(null as unknown as string);
+          } else {
+            toast({
+              title: "Transaction Timeout",
+              description: "Transaction is taking longer than expected. Please check your wallet or try again.",
+              variant: "destructive",
+            });
+            setIsMinting(false);
+            setTxHash(null as unknown as string);
+          }
+        }
+      }, 30000);
+      
+      setTimeoutId(timeout);
+      
+    } catch (error) {
+      console.error('Minting failed:', error);
+      toast({
+        title: "Minting Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      setIsMinting(false);
+      setTxHash(null);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const loadEditions = async () => {
+      try {
+        setLoading(true);
+        const loadedEditions = await loadAllEditions();
+        if (loadedEditions.length > 0) {
+          setEditions(loadedEditions);
+        } else {
+          setEditions(getFallbackEditions());
+        }
+      } catch (error) {
+        console.error('Failed to load editions:', error);
+        setEditions(getFallbackEditions());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEditions();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4 py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground">Loading Where Money Moves editions...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
-      {/* View Mode Toggle */}
-      <div className="flex justify-center">
-        <div className="flex items-center gap-2 p-1 bg-muted/50 rounded-lg">
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setViewMode('grid')}
-            className="flex items-center gap-2"
-          >
-            <Globe className="w-4 h-4" />
-            Grid View
-          </Button>
-          <Button
-            variant={viewMode === 'timeline' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setViewMode('timeline')}
-            className="flex items-center gap-2"
-          >
-            <Calendar className="w-4 h-4" />
-            Timeline
-          </Button>
-        </div>
-      </div>
-
-      {/* Claim All Button */}
       <div className="text-center">
-        <Button
-          onClick={() => setShowClaimFlow(true)}
-          className="claim-button text-lg px-12 py-6"
-        >
-          <TrendingUp className="w-5 h-5 mr-2" />
-          Claim Your Chapter
-        </Button>
-        <p className="text-sm text-muted-foreground mt-3">
-          Mint individual editions or claim the complete collection
-        </p>
+        {!canUserMint ? (
+          <div className="space-y-3">
+            <p className="text-muted-foreground">You've reached the maximum mint limit</p>
+            <Button disabled className="text-lg px-12 py-6">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Max Mints Reached
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Button
+              onClick={handleConnectAndMint}
+              disabled={isPending || isMinting || isConfirming}
+              className="claim-button text-lg px-12 py-6"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Connecting to wallet...
+                </>
+              ) : isMinting || isConfirming ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  {isMinting && !isConfirming ? 'Minting...' : 'Confirming...'}
+                </>
+              ) : !isConnected ? (
+                <>
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Connect & Mint
+                </>
+              ) : !isOnPlasma ? (
+                <>
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Switch to Plasma & Mint
+                </>
+              ) : (
+                <>
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Mint Your History
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Get 1 edition from the complete collection
+            </p>
+            {isConnected && (
+              <p className="text-xs text-muted-foreground">
+                You've minted {userMintedCount}/{maxMintsPerWallet} editions
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Editions Display */}
-      {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {editions.map((edition, index) => (
             <EditionCard
@@ -222,42 +268,15 @@ export const EditionSelector = () => {
             />
           ))}
         </div>
-      ) : (
-        <div className="max-w-4xl mx-auto space-y-6">
-          {editions.map((edition, index) => (
-            <div key={edition.id} className="flex items-center gap-6 animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
-              <div className="flex flex-col items-center">
-                <div className="timeline-marker" />
-                {index < editions.length - 1 && <div className="w-px h-16 bg-border/30 mt-2" />}
-              </div>
-              <div className="flex-1">
-                <EditionCard
-                  edition={edition}
-                  onClick={() => setSelectedEdition(edition)}
-                  compact
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      {/* Modals */}
       <EditionModal
         edition={selectedEdition}
         open={!!selectedEdition}
         onClose={() => setSelectedEdition(null)}
         onClaim={() => {
           setSelectedEdition(null);
-          setShowClaimFlow(true);
+          handleConnectAndMint();
         }}
-      />
-
-      <ClaimFlow
-        open={showClaimFlow}
-        onClose={() => setShowClaimFlow(false)}
-        editions={editions}
-        selectedEdition={selectedEdition}
       />
     </div>
   );

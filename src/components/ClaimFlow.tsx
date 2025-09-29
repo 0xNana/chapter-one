@@ -1,299 +1,291 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { 
-  ShoppingCart, 
-  Zap, 
-  CheckCircle, 
-  Clock, 
-  Wallet, 
-  ExternalLink,
-  Plus,
-  Minus
-} from "lucide-react";
+import { Wallet, TrendingUp, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface Edition {
-  id: number;
-  title: string;
-  date: string;
-  headline: string;
-  stat: string;
-  description: string;
-  lore: string;
-  mintCount: number;
-  totalSupply: number;
-  rarity: string;
-}
+import { useWMMContract } from "@/hooks/useWMMContract";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useNetworkSwitch } from "@/hooks/useNetworkSwitch";
 
 interface ClaimFlowProps {
   open: boolean;
   onClose: () => void;
-  editions: Edition[];
-  selectedEdition?: Edition | null;
+  quantity?: number;
 }
 
-export const ClaimFlow = ({ open, onClose, editions, selectedEdition }: ClaimFlowProps) => {
+export const ClaimFlow = ({ open, onClose, quantity = 1 }: ClaimFlowProps) => {
   const { toast } = useToast();
-  const [selectedEditions, setSelectedEditions] = useState<Record<number, number>>({});
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [mintStep, setMintStep] = useState<'selected' | 'claim'>('selected');
   const [isMinting, setIsMinting] = useState(false);
-  const [mintStep, setMintStep] = useState<'select' | 'confirm' | 'minting' | 'success'>('select');
-
-  // Initialize with selected edition if provided
-  useEffect(() => {
-    if (selectedEdition && open) {
-      setSelectedEditions({ [selectedEdition.id]: 1 });
-    }
-  }, [selectedEdition, open]);
-
-  const availableEditions = editions.filter(e => e.mintCount < e.totalSupply && e.id !== 13);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [initialMintCount, setInitialMintCount] = useState<number>(0);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   
-  const updateQuantity = (editionId: number, delta: number) => {
-    setSelectedEditions(prev => {
-      const current = prev[editionId] || 0;
-      const newQuantity = Math.max(0, Math.min(5, current + delta)); // Max 5 per edition
-      
-      if (newQuantity === 0) {
-        const { [editionId]: removed, ...rest } = prev;
-        return rest;
-      }
-      
-      return { ...prev, [editionId]: newQuantity };
-    });
-  };
+  const { isConnected } = useAccount();
+  const { mintRandomEditions, maxMintsPerWallet, userMintedCount, refreshSupplyData } = useWMMContract();
+  const { isOnPlasma, ensurePlasmaNetwork } = useNetworkSwitch();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed, error: confirmError } = useWaitForTransactionReceipt({
+    hash: txHash as `0x${string}` | undefined,
+    query: {
+      enabled: !!txHash && !!txHash.startsWith('0x'),
+    }
+  });
 
-  const totalItems = Object.values(selectedEditions).reduce((sum, qty) => sum + qty, 0);
-  const totalCost = totalItems * 0.05; // 0.05 ETH per edition
-
-  const handleConnectWallet = async () => {
-    setIsConnecting(true);
-    // Simulate wallet connection
-    setTimeout(() => {
-      setIsConnecting(false);
-      setMintStep('confirm');
-      toast({
-        title: "Wallet Connected",
-        description: "Ready to mint your collection",
-      });
-    }, 1500);
-  };
-
-  const handleMint = async () => {
-    setMintStep('minting');
-    setIsMinting(true);
-    
-    // Simulate minting process
-    setTimeout(() => {
+  useEffect(() => {
+    if (open) {
+      setMintStep('selected');
       setIsMinting(false);
-      setMintStep('success');
+      setTxHash(null);
+      setInitialMintCount(userMintedCount);
+      // Clear any existing timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  }, [open, userMintedCount, timeoutId]);
+
+  // Check if minting was successful by comparing mint counts
+  useEffect(() => {
+    if (isMinting && txHash && userMintedCount > initialMintCount) {
+      // Mint count increased, transaction was successful
       toast({
         title: "Minting Complete!",
-        description: `Successfully minted ${totalItems} edition${totalItems > 1 ? 's' : ''} from Chapter 1`,
+        description: `Successfully minted ${quantity} edition${quantity > 1 ? 's' : ''} from Chapter 1`,
       });
-    }, 3000);
+      
+      setTimeout(() => {
+        refreshSupplyData();
+      }, 1000);
+      
+      handleClose();
+    }
+  }, [isMinting, txHash, userMintedCount, initialMintCount, quantity, toast, refreshSupplyData]);
+
+  useEffect(() => {
+    if (isConfirmed && txHash) {
+      toast({
+        title: "Minting Complete!",
+        description: `Successfully minted ${quantity} edition${quantity > 1 ? 's' : ''} from Chapter 1`,
+      });
+      
+      setTimeout(() => {
+        refreshSupplyData();
+      }, 1000);
+      
+      handleClose();
+    }
+  }, [isConfirmed, txHash, quantity, toast, refreshSupplyData]);
+
+  useEffect(() => {
+    if (confirmError) {
+      console.error('Transaction confirmation failed:', confirmError);
+      toast({
+        title: "Transaction Failed",
+        description: "Your transaction was not confirmed on the blockchain",
+        variant: "destructive",
+      });
+      setIsMinting(false);
+      setMintStep('selected');
+      setTxHash(null);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
+  }, [confirmError, toast, timeoutId]);
+
+  const handleMint = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to mint",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Ensure we're on Plasma network
+    if (!isOnPlasma) {
+      try {
+        await ensurePlasmaNetwork();
+        toast({
+          title: "Network Switched",
+          description: "Switched to Plasma network. You can now mint.",
+        });
+        return; // Let user try again after network switch
+      } catch (error) {
+        toast({
+          title: "Network Switch Required",
+          description: "Please switch to Plasma network to mint",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (userMintedCount + quantity > maxMintsPerWallet) {
+      toast({
+        title: "Mint Limit Exceeded",
+        description: `You can only mint ${maxMintsPerWallet} editions total`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsMinting(true);
+      setMintStep('claim');
+      setInitialMintCount(userMintedCount);
+      
+      const hash = await mintRandomEditions(quantity);
+      setTxHash(hash as unknown as string);
+      
+      // Set a timeout to handle stuck transactions (30 seconds)
+      const timeout = setTimeout(() => {
+        if (isMinting) {
+          console.log('Transaction timeout - checking if mint was successful by count');
+          // Check if mint count increased despite timeout
+          if (userMintedCount > initialMintCount) {
+            toast({
+              title: "Minting Complete!",
+              description: `Successfully minted ${quantity} edition${quantity > 1 ? 's' : ''} from Chapter 1`,
+            });
+            handleClose();
+          } else {
+            toast({
+              title: "Transaction Timeout",
+              description: "Transaction is taking longer than expected. Please check your wallet or try again.",
+              variant: "destructive",
+            });
+            setIsMinting(false);
+            setMintStep('selected');
+            setTxHash(null);
+          }
+        }
+      }, 30000);
+      
+      setTimeoutId(timeout);
+      
+    } catch (error) {
+      console.error('Minting failed:', error);
+      toast({
+        title: "Minting Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      setIsMinting(false);
+      setMintStep('selected');
+      setTxHash(null as unknown as string);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+    }
   };
 
   const handleClose = () => {
-    setSelectedEditions({});
-    setMintStep('select');
+    setMintStep('selected');
     setIsMinting(false);
+    setTxHash(null as string | null);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
     onClose();
   };
 
   const renderStepContent = () => {
     switch (mintStep) {
-      case 'select':
+      case 'selected':
         return (
           <div className="space-y-6">
             <div className="text-center">
               <h3 className="text-2xl font-bold text-foreground mb-2">
-                Select Your Editions
+                Ready to Mint
               </h3>
               <p className="text-muted-foreground">
-                Choose which pieces of financial history to claim
+                You will receive {quantity} {quantity === 1 ? 'edition' : 'editions'} from the complete collection
               </p>
             </div>
 
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {availableEditions.map((edition) => {
-                const quantity = selectedEditions[edition.id] || 0;
-                const isSelected = quantity > 0;
-                
-                return (
-                  <Card key={edition.id} className={`p-4 transition-all ${isSelected ? 'border-primary/50 bg-primary/5' : 'border-border/50'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className="text-xs">
-                            #{edition.id.toString().padStart(2, '0')}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {edition.rarity}
-                          </Badge>
-                        </div>
-                        <h4 className="font-medium text-foreground">{edition.title}</h4>
-                        <p className="text-sm text-muted-foreground">{edition.headline}</p>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">0.05 ETH</span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(edition.id, -1)}
-                            disabled={quantity === 0}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="w-6 text-center text-sm font-medium">{quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(edition.id, 1)}
-                            disabled={quantity >= 5}
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-
-            {totalItems > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium">Total</span>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-foreground">{totalCost.toFixed(3)} ETH</div>
-                      <div className="text-sm text-muted-foreground">{totalItems} edition{totalItems > 1 ? 's' : ''}</div>
-                    </div>
-                  </div>
-                  
-                  <Button onClick={handleConnectWallet} disabled={isConnecting} className="w-full claim-button">
-                    <Wallet className="w-4 h-4 mr-2" />
-                    {isConnecting ? 'Connecting...' : 'Connect Wallet & Continue'}
-                  </Button>
+            <div className="bg-muted/30 p-6 rounded-xl border border-border/30">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-8 h-8 text-primary" />
                 </div>
-              </>
-            )}
-          </div>
-        );
-
-      case 'confirm':
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-foreground mb-2">
-                Confirm Your Mint
-              </h3>
-              <p className="text-muted-foreground">
-                Review your selection before minting
-              </p>
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Where Money Moves - Chapter 1</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {quantity} {quantity === 1 ? 'edition' : 'editions'} from 13 historic moments
+                  </p>
+                </div>
+              </div>
             </div>
-
-            <Card className="p-6 bg-muted/30">
-              <h4 className="font-medium text-foreground mb-4">Selected Editions</h4>
-              <div className="space-y-3">
-                {Object.entries(selectedEditions).map(([editionId, quantity]) => {
-                  const edition = editions.find(e => e.id === parseInt(editionId))!;
-                  return (
-                    <div key={editionId} className="flex items-center justify-between">
-                      <div>
-                        <span className="font-medium">{edition.title}</span>
-                        <span className="text-sm text-muted-foreground ml-2">x{quantity}</span>
-                      </div>
-                      <span className="font-medium">{(0.05 * quantity).toFixed(3)} ETH</span>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <Separator className="my-4" />
-              
-              <div className="flex items-center justify-between text-lg font-bold">
-                <span>Total</span>
-                <span>{totalCost.toFixed(3)} ETH</span>
-              </div>
-            </Card>
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setMintStep('select')} className="flex-1">
-                Back
+              <Button
+                onClick={handleClose}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
               </Button>
-              <Button onClick={handleMint} className="flex-1 claim-button">
-                <Zap className="w-4 h-4 mr-2" />
-                Mint Now
+              <Button
+                onClick={() => setMintStep('claim')}
+                className="claim-button flex-1"
+              >
+                <Wallet className="w-4 h-4 mr-2" />
+                Connect Wallet & Claim
               </Button>
             </div>
           </div>
         );
 
-      case 'minting':
+      case 'claim':
         return (
-          <div className="space-y-6 text-center py-12">
-            <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+          <div className="text-center space-y-6">
+            <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+              {isMinting ? (
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              ) : (
+                <Wallet className="w-8 h-8 text-primary" />
+              )}
+            </div>
             <div>
-              <h3 className="text-2xl font-bold text-foreground mb-2">
-                Minting In Progress
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {isMinting && !isConfirming ? 'Transaction Submitted' : 
+                 isConfirming ? 'Confirming Transaction' : 
+                 'Ready to Mint'}
               </h3>
               <p className="text-muted-foreground">
-                Your transaction is being processed on-chain...
-              </p>
-            </div>
-            <div className="animate-shimmer h-2 bg-muted/50 rounded-full" />
-          </div>
-        );
-
-      case 'success':
-        return (
-          <div className="space-y-6 text-center py-8">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto animate-fade-in-up" />
-            <div>
-              <h3 className="text-3xl font-bold text-foreground mb-2">
-                Minting Complete!
-              </h3>
-              <p className="text-muted-foreground text-lg">
-                You've successfully claimed {totalItems} edition{totalItems > 1 ? 's' : ''} from Chapter 1
+                {isMinting && !isConfirming ? `Transaction submitted! Waiting for confirmation...` :
+                 isConfirming ? `Please wait while we confirm your ${quantity} edition${quantity > 1 ? 's' : ''} on the blockchain...` :
+                 `You're about to mint ${quantity} random edition${quantity > 1 ? 's' : ''} from Chapter 1`
+                }
               </p>
             </div>
             
-            <Card className="p-6 bg-gradient-gold-subtle">
-              <h4 className="font-medium text-foreground mb-3">Your New Collection</h4>
-              <div className="space-y-2">
-                {Object.entries(selectedEditions).map(([editionId, quantity]) => {
-                  const edition = editions.find(e => e.id === parseInt(editionId))!;
-                  return (
-                    <div key={editionId} className="flex items-center justify-between">
-                      <span>{edition.title}</span>
-                      <Badge>{quantity}x</Badge>
-                    </div>
-                  );
-                })}
+            {!isMinting && !isConfirming && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setMintStep('selected')}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleMint}
+                  className="claim-button flex-1"
+                  disabled={!isConnected}
+                >
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  {isConnected ? 'Mint Now' : 'Connect Wallet'}
+                </Button>
               </div>
-            </Card>
-
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1">
-                <ExternalLink className="w-4 h-4 mr-2" />
-                View on OpenSea
-              </Button>
-              <Button onClick={handleClose} className="flex-1 claim-button">
-                Close
-              </Button>
-            </div>
+            )}
           </div>
         );
 
@@ -304,13 +296,13 @@ export const ClaimFlow = ({ open, onClose, editions, selectedEdition }: ClaimFlo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl bg-card border-border/50 shadow-premium">
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="chapter-title text-2xl">
-            Claim Your Chapter
+          <DialogTitle className="text-center">
+            {mintStep === 'selected' ? 'Confirm Your Mint' : 'Minting Process'}
           </DialogTitle>
         </DialogHeader>
-
+        
         {renderStepContent()}
       </DialogContent>
     </Dialog>

@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #8",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreidpk4ig3m7vxdfrbv3oawmmpnm542wj5z6ncr5pjbgvw2fylfweai",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 8
+    },
+    {
+      "trait_type": "date",
+      "value": "June 30, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "Regulation & TradFi Entry"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Teal Grid"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "GENIUS Act, Circle Surge, Fiserv Launch"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-8"
+    }
+  ]
+}

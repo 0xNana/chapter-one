@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #11",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreibserbnd6l2nvl6wppfgo7j73p3bdufowthjgomf67jugnunvpolq",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 11
+    },
+    {
+      "trait_type": "date",
+      "value": "August 18, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "Infra Expansion & Global Regulatory Wins"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Blue Grid"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "Circle L1, Stripe Chain, Plasma x Pendle"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-11"
+    }
+  ]
+}

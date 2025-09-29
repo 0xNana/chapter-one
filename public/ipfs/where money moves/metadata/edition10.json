@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #10",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreictxv74qm5raiul3podwcmykq5kfpu3spz5wbrtixp6vhr3s44a3y",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 10
+    },
+    {
+      "trait_type": "date",
+      "value": "August 4, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "Public Sale & Asia Regulation"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Blue Geometry"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "$373M raise, HK Ordinance, ECB warning"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-10"
+    }
+  ]
+}

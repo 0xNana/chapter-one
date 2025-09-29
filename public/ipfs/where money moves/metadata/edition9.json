@@ -1,0 +1,31 @@
+{
+  "name": "Where Money Moves - Edition #9",
+  "description": "Plasma is building the rails for stablecoins to become a global money standard—faster, cheaper, and programmable.\n\nThis collection is a living archive, curated by the Plasma community, capturing key moments in the shift toward borderless finance.",
+  "image": "ipfs://bafkreidwqqyrd4tbn3fmpokyonixsgs5kyckvscgyfxpducvixvxr2tld4",
+  "attributes": [
+    {
+      "trait_type": "edition",
+      "value": 9
+    },
+    {
+      "trait_type": "date",
+      "value": "July 22, 2025"
+    },
+    {
+      "trait_type": "theme",
+      "value": "Launch & Legislative Momentum"
+    },
+    {
+      "trait_type": "visualTier",
+      "value": "Blue Grid"
+    },
+    {
+      "trait_type": "loreFragment",
+      "value": "GENIUS Act, Circle Bank License, Testnet"
+    },
+    {
+      "trait_type": "external_url",
+      "value": "https://plasma.beehiiv.com/p/where-money-moves-edition-9"
+    }
+  ]
+}

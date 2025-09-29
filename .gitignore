@@ -1,4 +1,3 @@
-# Logs
 logs
 *.log
 npm-debug.log*
@@ -12,7 +11,6 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -22,3 +20,32 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.env
+.env.local
+.env.development
+.env.production
+.env.plasma
+.env.monad
+.env.somnia
+.env.rise
+.env.hardhat
+.env.test
+.env.staging
+.env.development.local
+.env.production.local
+.env.plasma.local
+.env.monad.local
+.env.somnia.local
+.env.rise.local
+.env.hardhat.local
+.env.test.local
+.env.staging.local
+.env.development.production
+.env.production.production
+.env.plasma.production
+.env.monad.production
+.env.somnia.production
+.env.rise.production
+.env.hardhat.production
+.env.test.production
+.env.staging.production
